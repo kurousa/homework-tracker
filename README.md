@@ -1,5 +1,110 @@
-# Vue 3 + Vite
+# 🎒 宿題管理システム 「きょうのしゅくだい」 (Homework Tracker)
 
-This template should help get you started developing with Vue 3 in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+親子で楽しく、わかりやすく日々の宿題や目標を管理・追跡できる、**Vue 3 + Vite + TailwindCSS** で構築されたモダンなWebアプリケーションです。
 
-Learn more about IDE Support for Vue in the [Vue Docs Scaling up Guide](https://vuejs.org/guide/scaling-up/tooling.html#ide-support).
+---
+
+## ✨ 主な特徴 (Features)
+
+### 1. 👥 親子で切り替わる「ダブル・テーマ」UI
+使う人に合わせた最適なデザインシステムを採用しており、ワンタップでスムーズに切り替えることができます。
+*   **👩‍💻 保護者モード (Parent Mode)**
+    *   シックで洗練されたプロフェッショナルなデザイン（フォント: `Inter`）。
+    *   子どもの宿題の登録、期限設定、編集、削除、進捗率の視覚的な確認が可能。
+*   **👦👧 子どもモード (Child Mode)**
+    *   温かみのあるカラフルで親しみやすいキッズデザイン（フォント: `Zen Maru Gothic`）。
+    *   ひらがな・カタカナを意識した分かりやすい表記。
+    *   宿題の完了チェックに加え、子ども自身が決めた「今日の目標」を自由に追加できる機能。
+
+### 2. 🔐 安心のペアレンタルコントロール (PINコード機能)
+*   子どもが誤って保護者モードに入り、宿題の内容や設定を変更してしまわないよう、**4桁のPINコード（暗証番号）によるアクセス制限**を搭載しています。
+*   初回起動時にPINコードを簡単にセットアップできます。
+
+### 3. 👥 複数のお子様に対応 (マルチチャイルド)
+*   兄弟姉妹がいるご家庭でも安心！複数の子どもを個別に登録・管理できます。
+*   宿題リストや進捗状況は、子どもごとに独立して管理されます。
+
+### 4. 🎉 モチベーションを高める「お祝い演出」
+*   きょうの宿題と目標をすべてクリアすると、画面いっぱいにカラフルな紙吹雪（Confetti）が舞い上がる楽しい演出を搭載！
+*   お子様の「できた！」という達成感を刺激し、毎日の学習習慣化をサポートします。
+
+### 5. 💾 面倒な登録なしですぐに使える (データ永続化)
+*   面倒な会員登録やログインは一切不要。
+*   入力された宿題や登録した子どもデータ、PINコードはすべてブラウザの `localStorage` に安全に保存されるため、ページをリロードしたり閉じたりしてもデータが消えません。
+
+---
+
+## 🛠️ 技術スタック (Tech Stack)
+
+*   **フロントエンドフレームワーク**: Vue 3 (Composition API / `<script setup>`)
+*   **ビルドツール**: Vite
+*   **状態管理 (State Management)**: Pinia
+*   **スタイリング (CSS)**: TailwindCSS + PostCSS + Font Awesome 6 (アイコン)
+*   **デザイン・フォント**:
+    *   Zen Maru Gothic (子ども向け丸ゴシック体)
+    *   Inter (保護者向けサンセリフ体)
+*   **演出ライブラリ**: canvas-confetti (CDN経由)
+*   **テストツール**: Vitest + @vue/test-utils + jsdom
+
+---
+
+## 📂 プロジェクトのフォルダ構成 (Directory Structure)
+
+```text
+src/
+├── assets/         # 静的アセット
+├── components/     # UIコンポーネント
+│   ├── common/     # 共通UI (ヘッダー、トースト通知など)
+│   ├── dashboards/ # メインダッシュボード (保護者用 / 子ども用)
+│   └── modals/     # モーダル (役割選択、PIN設定/入力、子ども選択、目標追加など)
+├── stores/         # Pinia 状態管理ストア
+│   ├── useAuthStore.js      # ロール状態、PIN認証ロジック
+│   ├── useChildStore.js     # 子どもプロファイル管理
+│   ├── useHomeworkStore.js  # 宿題・目標のCRUD、進捗計算ロジック
+│   └── useToastStore.js     # 通知システム
+├── utils/          # ユーティリティ
+│   └── confetti.js          # 紙吹雪アニメーション制御
+├── App.vue         # メインアプリケーションコンポーネント
+└── main.js         # エントリーポイント
+```
+
+---
+
+## 🚀 動作方法 (Getting Started)
+
+### 前提条件
+*   Node.js (LTS推奨)
+*   npm または yarn
+
+### 1. 依存関係のインストール
+プロジェクトのルートディレクトリで以下を実行します：
+```bash
+npm install
+```
+
+### 2. 開発サーバーの起動 (ローカル実行)
+ローカルでアプリケーションを実行し、ブラウザで確認します：
+```bash
+npm run dev
+```
+起動後、ターミナルに表示されるURL（例: `http://localhost:5173`）にアクセスしてください。
+
+### 3. プロダクション用ビルド
+本番環境向けにコードを最適化・ビルドします：
+```bash
+npm run build
+```
+生成されたファイルは `dist` ディレクトリに出力されます。
+
+### 4. テストの実行
+Vitest を使用して、定義されているテストスイートを実行します：
+```bash
+npm run test
+```
+
+---
+
+## 📝 ライセンス
+
+このプロジェクトは、プライベートな宿題管理ツールとして開発されています。
+親子のコミュニケーションを深め、日々の学習をポジティブにするためのソリューションです。
