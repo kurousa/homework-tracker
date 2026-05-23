@@ -1,0 +1,37 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Transition styles for smooth shifting between modes */
+.theme-transition {
+  transition: background-color 0.4s ease, font-family 0.3s ease;
+}
+
+/* Child Mode styles: cute and bubbly */
+.font-kids {
+  font-family: 'Zen Maru Gothic', sans-serif;
+}
+.bounce-card {
+  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.bounce-card:active {
+  transform: scale(0.95);
+}
+
+/* Parent Mode styles: Sharp, crisp, and professional */
+.font-professional {
+  font-family: 'Inter', 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', Meiryo, sans-serif;
+}
+
+/* Sparkle effect for complete state */
+@keyframes sparkle {
+  0%, 100% { transform: scale(1); filter: drop-shadow(0 0 5px rgba(251, 191, 36, 0.6)); }
+  50% { transform: scale(1.05); filter: drop-shadow(0 0 20px rgba(251, 191, 36, 1)); }
+}
+.celebrate-pulse {
+  animation: sparkle 2s infinite ease-in-out;
+}
+
+[v-cloak] {
+  display: none;
+}
