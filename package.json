@@ -1,21 +1,27 @@
 {
-  "name": "temp_vite",
+  "name": "homework-tracker",
   "private": true,
   "version": "0.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "vitest"
   },
   "dependencies": {
+    "pinia": "^3.0.4",
     "vue": "^3.5.34"
   },
   "devDependencies": {
+    "@pinia/testing": "^1.0.3",
     "@vitejs/plugin-vue": "^6.0.6",
+    "@vue/test-utils": "^2.4.10",
     "autoprefixer": "^10.5.0",
+    "jsdom": "^29.1.1",
     "postcss": "^8.5.14",
     "tailwindcss": "^3.4.19",
-    "vite": "^8.0.12"
+    "vite": "^8.0.12",
+    "vitest": "^4.1.6"
   }
 }
