@@ -124,64 +124,164 @@ const getSubjectStyles = (subject) => {
     default: return { parentBg: 'bg-purple-50', parentText: 'text-purple-700 border-purple-200' }
   }
 }
+
+// 子ども管理用のリアクティブデータとメソッド
+const newChildName = ref('')
+const selectedEmoji = ref('👦')
+const availableEmojis = ['👦', '👧', '👶', '🐱', '🐶', '🐻', '🐼', '🦁', '🐸', '🐨', '🦊', '🐰']
+
+const handleAddChild = () => {
+  const name = newChildName.value.trim()
+  if (!name) {
+    toastStore.triggerToast('システムエラー: お子様の名前を入力してください。')
+    return
+  }
+
+  const added = childStore.addChild(name, selectedEmoji.value)
+  if (added) {
+    toastStore.triggerToast(`システムログ: ${added.name}ちゃんを新しく登録しました。`)
+    newChildName.value = ''
+    selectedEmoji.value = '👦'
+  }
+}
+
+const handleDeleteChild = (child) => {
+  const confirmed = confirm(`「${child.name}」ちゃんを削除しますか？\n登録されている宿題もすべて削除されます。この操作は取り消せません。`)
+  if (confirmed) {
+    const success = childStore.deleteChild(child.id)
+    if (success) {
+      homeworkStore.deleteHomeworksForChild(child.id)
+      toastStore.triggerToast(`システムログ: ${child.name}ちゃんを削除しました。`)
+    }
+  }
+}
 </script>
 
 <template>
   <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 space-y-0">
-    <!-- Column 1: Homework Registrator Form (Left side) -->
-    <div class="lg:col-span-5 bg-white border border-slate-200 rounded-lg p-5 shadow-sm space-y-4 h-fit">
-      <div class="border-b border-slate-100 pb-3 flex items-center justify-between">
-        <h2 class="text-sm font-bold text-slate-800 uppercase tracking-wider flex items-center">
-          <i class="fa-solid fa-circle-plus text-blue-500 mr-2"></i>新規登録フォーム
-        </h2>
-        <span class="text-[10px] bg-slate-100 text-slate-500 px-2 py-0.5 rounded font-mono">HOMEWORK_REGISTRATOR</span>
-      </div>
+    <!-- Column 1: Left side (Homework Registrator & Child Management) -->
+    <div class="lg:col-span-5 space-y-6">
       
-      <div class="space-y-3">
-        <!-- Subject Dropdown -->
-        <div>
-          <label class="block text-xs font-semibold text-slate-500 mb-1">対象教科</label>
-          <div class="relative">
-            <select v-model="newHomework.subject" 
-                    class="w-full bg-white border border-slate-300 rounded text-xs py-2 px-3 text-slate-800 font-medium focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 appearance-none cursor-pointer">
-              <option value="国語">国語 🟥</option>
-              <option value="算数">算数 🟦</option>
-              <option value="理科">理科 🟩</option>
-              <option value="社会">社会 🟧</option>
-              <option value="その他">その他 🟪</option>
-            </select>
-            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-400 text-[10px]">
-              <i class="fa-solid fa-chevron-down"></i>
+      <!-- Box 1: Homework Registrator Form -->
+      <div class="bg-white border border-slate-200 rounded-lg p-5 shadow-sm space-y-4">
+        <div class="border-b border-slate-100 pb-3 flex items-center justify-between">
+          <h2 class="text-sm font-bold text-slate-800 uppercase tracking-wider flex items-center">
+            <i class="fa-solid fa-circle-plus text-blue-500 mr-2"></i>新規登録フォーム
+          </h2>
+          <span class="text-[10px] bg-slate-100 text-slate-500 px-2 py-0.5 rounded font-mono">HOMEWORK_REGISTRATOR</span>
+        </div>
+        
+        <div class="space-y-3">
+          <!-- Subject Dropdown -->
+          <div>
+            <label class="block text-xs font-semibold text-slate-500 mb-1">対象教科</label>
+            <div class="relative">
+              <select v-model="newHomework.subject" 
+                      class="w-full bg-white border border-slate-300 rounded text-xs py-2 px-3 text-slate-800 font-medium focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 appearance-none cursor-pointer">
+                <option value="国語">国語 🟥</option>
+                <option value="算数">算数 🟦</option>
+                <option value="理科">理科 🟩</option>
+                <option value="社会">社会 🟧</option>
+                <option value="その他">その他 🟪</option>
+              </select>
+              <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-400 text-[10px]">
+                <i class="fa-solid fa-chevron-down"></i>
+              </div>
+            </div>
+          </div>
+
+          <!-- Free Input Area for Other Subject -->
+          <div v-if="newHomework.subject === 'その他'" class="animate-fade-in">
+            <label class="block text-xs font-semibold text-slate-500 mb-1">教科名を入力してください</label>
+            <input v-model="newHomework.customSubject" 
+                   type="text" 
+                   placeholder="例: 英語、音楽、図工" 
+                   class="w-full bg-white border border-slate-300 rounded text-xs py-2 px-3 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500" />
+          </div>
+
+          <!-- Title Input -->
+          <div>
+            <label class="block text-xs font-semibold text-slate-500 mb-1">実施内容 (宿題詳細)</label>
+            <input v-model="newHomework.title" 
+                   @keyup.enter="addHomework"
+                   type="text" 
+                   placeholder="例: かんじドリル 5ページ、計算カード10分" 
+                   class="w-full bg-white border border-slate-300 rounded text-xs py-2 px-3 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500" />
+          </div>
+        </div>
+
+        <!-- Registry Button -->
+        <button @click="addHomework" 
+                class="w-full bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold py-2.5 px-4 rounded shadow-sm transition-colors flex items-center justify-center space-x-2">
+          <i class="fa-solid fa-plus text-[10px]"></i>
+          <span>宿題をデータベースに追加</span>
+        </button>
+      </div>
+
+      <!-- Box 2: Child Management Menu -->
+      <div class="bg-white border border-slate-200 rounded-lg p-5 shadow-sm space-y-4">
+        <div class="border-b border-slate-100 pb-3 flex items-center justify-between">
+          <h2 class="text-sm font-bold text-slate-800 uppercase tracking-wider flex items-center">
+            <i class="fa-solid fa-users text-blue-500 mr-2"></i>子ども管理メニュー
+          </h2>
+          <span class="text-[10px] bg-slate-100 text-slate-500 px-2 py-0.5 rounded font-mono">CHILD_MANAGEMENT</span>
+        </div>
+
+        <!-- Registered Children List -->
+        <div class="space-y-2">
+          <label class="block text-xs font-semibold text-slate-500 mb-1">登録されている子ども</label>
+          <div class="divide-y divide-slate-100 border border-slate-200 rounded bg-slate-50 p-2 max-h-[160px] overflow-y-auto">
+            <div v-for="child in children" :key="child.id" class="flex items-center justify-between py-2 px-2 hover:bg-white rounded transition-colors">
+              <div class="flex items-center space-x-2">
+                <span class="text-lg">{{ child.icon }}</span>
+                <span class="text-xs font-bold text-slate-700">{{ child.name }}</span>
+              </div>
+              <button @click="handleDeleteChild(child)" 
+                      class="text-slate-400 hover:text-rose-600 p-1 transition-colors"
+                      title="この子どもを削除">
+                <i class="fa-solid fa-trash-can text-xs"></i>
+              </button>
             </div>
           </div>
         </div>
 
-        <!-- Free Input Area for Other Subject -->
-        <div v-if="newHomework.subject === 'その他'" class="animate-fade-in">
-          <label class="block text-xs font-semibold text-slate-500 mb-1">教科名を入力してください</label>
-          <input v-model="newHomework.customSubject" 
-                 type="text" 
-                 placeholder="例: 英語、音楽、図工" 
-                 class="w-full bg-white border border-slate-300 rounded text-xs py-2 px-3 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500" />
-        </div>
+        <!-- Add Child Form -->
+        <div class="space-y-3 pt-2">
+          <label class="block text-xs font-semibold text-slate-500 mb-1">子どもの新規追加</label>
+          
+          <!-- Name Input -->
+          <div>
+            <input v-model="newChildName" 
+                   type="text" 
+                   placeholder="なまえ (例: たろう)" 
+                   class="w-full bg-white border border-slate-300 rounded text-xs py-2 px-3 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500" />
+          </div>
 
-        <!-- Title Input -->
-        <div>
-          <label class="block text-xs font-semibold text-slate-500 mb-1">実施内容 (宿題詳細)</label>
-          <input v-model="newHomework.title" 
-                 @keyup.enter="addHomework"
-                 type="text" 
-                 placeholder="例: かんじドリル 5ページ、計算カード10分" 
-                 class="w-full bg-white border border-slate-300 rounded text-xs py-2 px-3 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500" />
+          <!-- Icon Selection -->
+          <div>
+            <span class="block text-[10px] font-semibold text-slate-400 mb-1">アイコンを選択</span>
+            <div class="grid grid-cols-6 gap-2">
+              <button v-for="emoji in availableEmojis" 
+                      :key="emoji"
+                      @click="selectedEmoji = emoji"
+                      :class="[
+                        selectedEmoji === emoji ? 'bg-blue-50 border-blue-500 ring-2 ring-blue-500/20' : 'bg-white border-slate-200 hover:bg-slate-50',
+                        'border rounded p-1 text-base transition-all flex items-center justify-center'
+                      ]">
+                {{ emoji }}
+              </button>
+            </div>
+          </div>
+
+          <!-- Add Button -->
+          <button @click="handleAddChild" 
+                  class="w-full bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold py-2 px-4 rounded shadow-sm transition-colors flex items-center justify-center space-x-2">
+            <i class="fa-solid fa-user-plus text-[10px]"></i>
+            <span>子どもを登録</span>
+          </button>
         </div>
       </div>
 
-      <!-- Registry Button -->
-      <button @click="addHomework" 
-              class="w-full bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold py-2.5 px-4 rounded shadow-sm transition-colors flex items-center justify-center space-x-2">
-        <i class="fa-solid fa-plus text-[10px]"></i>
-        <span>宿題をデータベースに追加</span>
-      </button>
     </div>
 
     <!-- Column 2: Dashboard Statistics & Homework Table List (Right side) -->

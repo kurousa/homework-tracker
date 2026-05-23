@@ -27,7 +27,7 @@ export const useAuthStore = defineStore('auth', () => {
   const setupPin = (pin) => {
     parentPin.value = pin
     showPinSetup.value = false
-    isParentMode.value = true // automatically switch to parent mode
+    setRole('parent') // automatically switch to parent mode
   }
 
   const verifyPin = (pin) => {
@@ -53,9 +53,15 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
+  const resetRole = () => {
+    localStorage.removeItem('homework_default_role')
+    isParentMode.value = false
+    isRoleSelected.value = false
+  }
+
   return { 
     isRoleSelected, isParentMode, parentPin, 
     showPinSetup, showPinEntry, 
-    setRole, setupPin, verifyPin, toggleMode 
+    setRole, setupPin, verifyPin, toggleMode, resetRole 
   }
 })

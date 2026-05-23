@@ -10,14 +10,14 @@ describe('useHomeworkStore', () => {
     localStorage.clear()
   })
 
-  it('initializes with default homeworks if local storage is empty', () => {
+  it('initializes with default homeworks as empty array if children are empty', () => {
     const store = useHomeworkStore()
-    expect(store.homeworks.length).toBe(2)
+    expect(store.homeworks.length).toBe(0)
   })
 
   it('adds a new homework', () => {
     const store = useHomeworkStore()
-    const initialCount = store.homeworks.length
+    const initialCount = store.homeworks.length // 0
     
     store.addHomework({
       subject: '理科',
@@ -34,6 +34,12 @@ describe('useHomeworkStore', () => {
 
   it('toggles homework completion status', () => {
     const store = useHomeworkStore()
+    
+    // Add mock homework since initially empty
+    store.homeworks = [
+      { id: 1, subject: '国語', title: 'テスト', is_completed: false, childId: 1, type: 'parent' }
+    ]
+    
     const target = store.homeworks[0]
     const currentStatus = target.is_completed
     
@@ -46,8 +52,9 @@ describe('useHomeworkStore', () => {
     const store = useHomeworkStore()
     const childStore = useChildStore()
     
-    // childStore.children is ['たろう', 'はなこ', 'じろう'] by default.
-    const activeChildId = childStore.children[0].id
+    // Add mock child since initial state is empty
+    const addedChild = childStore.addChild('たろう', '👦')
+    const activeChildId = addedChild.id
     childStore.selectChild(activeChildId, false)
     
     // clear homeworks and add 2 for the active child
@@ -65,5 +72,21 @@ describe('useHomeworkStore', () => {
     // progress should be 100%
     expect(store.progressPercentage).toBe(100)
     expect(store.allDone).toBe(true)
+  })
+
+  it('deletes all homeworks for a specific child', () => {
+    const store = useHomeworkStore()
+    
+    store.homeworks = [
+      { id: 1, subject: '国語', title: '漢字', is_completed: false, childId: 1, type: 'parent' },
+      { id: 2, subject: '算数', title: '計算', is_completed: false, childId: 2, type: 'parent' },
+      { id: 3, subject: '理科', title: '観察', is_completed: false, childId: 1, type: 'parent' }
+    ]
+    
+    store.deleteHomeworksForChild(1)
+    
+    expect(store.homeworks.length).toBe(1)
+    expect(store.homeworks[0].id).toBe(2)
+    expect(store.homeworks[0].childId).toBe(2)
   })
 })

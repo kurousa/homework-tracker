@@ -15,12 +15,15 @@ import CelebrationModal from '@/components/modals/CelebrationModal.vue'
 import ChildGoalAddModal from '@/components/modals/ChildGoalAddModal.vue'
 import ParentDashboard from '@/components/dashboards/ParentDashboard.vue'
 import ChildDashboard from '@/components/dashboards/ChildDashboard.vue'
+import ChildRegisterModal from '@/components/modals/ChildRegisterModal.vue'
+import { useToastStore } from '@/stores/useToastStore'
 
 import { fireConfetti } from '@/utils/confetti'
 
 const authStore = useAuthStore()
 const childStore = useChildStore()
 const homeworkStore = useHomeworkStore()
+const toastStore = useToastStore()
 
 const { isRoleSelected, isParentMode, showPinSetup, showPinEntry } = storeToRefs(authStore)
 const { currentChildId } = storeToRefs(childStore)
@@ -30,6 +33,7 @@ const { allDone } = storeToRefs(homeworkStore)
 const showChildSelection = ref(false)
 const showChildAddModal = ref(false)
 const showCelebration = ref(true)
+const showChildRegisterFromChild = ref(false)
 
 // Initialization logic
 onMounted(() => {
@@ -55,6 +59,10 @@ watch(allDone, (isFinished) => {
 });
 
 const handleSelectChildRole = () => {
+  if (childStore.children.length === 0) {
+    showChildRegisterFromChild.value = true
+    return
+  }
   showChildSelection.value = true
 }
 
@@ -115,6 +123,16 @@ const closePinEntry = () => {
       <PinSetupModal v-if="showPinSetup" @close="closePinSetup" />
     </transition>
 
+    <!-- 6. 子どもの初期登録モーダル (子ども画面からの誘導用) -->
+    <transition name="fade">
+      <ChildRegisterModal 
+        v-if="showChildRegisterFromChild" 
+        :is-from-child="true"
+        @back-to-roles="showChildRegisterFromChild = false"
+        @close="showChildRegisterFromChild = false"
+      />
+    </transition>
+
     <!-- 3. PINコード入力画面 -->
     <transition name="fade">
       <PinEntryModal v-if="showPinEntry" @close="closePinEntry" />
@@ -123,6 +141,11 @@ const closePinEntry = () => {
     <!-- 4. じぶんの目標 追加モーダル (子ども画面用) -->
     <transition name="fade">
       <ChildGoalAddModal v-if="showChildAddModal" @close="showChildAddModal = false" />
+    </transition>
+
+    <!-- 5. 子どもの初期登録モーダル (保護者画面用) -->
+    <transition name="fade">
+      <ChildRegisterModal v-if="isParentMode && childStore.children.length === 0" @back-to-roles="authStore.resetRole()" />
     </transition>
 
     <!-- Stylized Toast Notification -->

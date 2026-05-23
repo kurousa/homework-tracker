@@ -25,6 +25,8 @@ describe('useAuthStore', () => {
     const store = useAuthStore()
     store.setupPin('1234')
     expect(store.parentPin).toBe('1234')
+    expect(store.isRoleSelected).toBe(true)
+    expect(localStorage.getItem('homework_default_role')).toBe('parent')
     
     // Switch to child
     store.isParentMode = false
@@ -33,5 +35,17 @@ describe('useAuthStore', () => {
     const isSuccess = store.verifyPin('1234')
     expect(isSuccess).toBe(true)
     expect(store.isParentMode).toBe(true)
+  })
+
+  it('resets role and clears local storage', () => {
+    const store = useAuthStore()
+    store.setRole('parent')
+    expect(store.isRoleSelected).toBe(true)
+    expect(store.isParentMode).toBe(true)
+    
+    store.resetRole()
+    expect(store.isRoleSelected).toBe(false)
+    expect(store.isParentMode).toBe(false)
+    expect(localStorage.getItem('homework_default_role')).toBe(null)
   })
 })

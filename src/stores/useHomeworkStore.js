@@ -11,9 +11,9 @@ export const useHomeworkStore = defineStore('homework', () => {
   const savedData = localStorage.getItem(STORAGE_KEY_ITEMS)
   let initialHomeworks = savedData ? JSON.parse(savedData) : []
   
-  // Set default items if empty
-  if (initialHomeworks.length === 0) {
-    const defaultChildId = childStore.children[0] ? childStore.children[0].id || childStore.children[0] : 1
+  // Set default items if empty and children exist
+  if (initialHomeworks.length === 0 && childStore.children.length > 0) {
+    const defaultChildId = childStore.children[0].id
     initialHomeworks = [
       { id: 1, subject: '国語', title: 'かんじドリル 3ページ', is_completed: false, childId: defaultChildId, type: 'parent' },
       { id: 2, subject: '算数', title: 'ぷりんと 1まい', is_completed: true, childId: defaultChildId, type: 'parent' }
@@ -82,6 +82,10 @@ export const useHomeworkStore = defineStore('homework', () => {
     }
   }
 
+  const deleteHomeworksForChild = (childId) => {
+    homeworks.value = homeworks.value.filter(h => h.childId !== childId)
+  }
+
   return {
     homeworks,
     activeHomeworks,
@@ -93,6 +97,7 @@ export const useHomeworkStore = defineStore('homework', () => {
     addHomework,
     deleteHomework,
     toggleComplete,
-    updateHomework
+    updateHomework,
+    deleteHomeworksForChild
   }
 })

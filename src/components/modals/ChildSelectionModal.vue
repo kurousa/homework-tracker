@@ -5,11 +5,11 @@ import { useAuthStore } from '@/stores/useAuthStore'
 const childStore = useChildStore()
 const authStore = useAuthStore()
 
-const emit = defineEmits(['select', 'close'])
+const emit = defineEmits(['child-selected', 'close'])
 
 const selectChild = (id) => {
   childStore.selectChild(id, authStore.isParentMode)
-  emit('select', id)
+  emit('child-selected', id)
 }
 </script>
 <template>
