@@ -38,6 +38,8 @@ const addChildGoal = () => {
   childGoalSubject.value = '国語'
   childGoalAction.value = childActionOptions[0]
   childGoalAmount.value = 1
+
+  emit('close')
 }
 </script>
 
