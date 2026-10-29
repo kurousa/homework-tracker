@@ -94,6 +94,18 @@ const closePinSetup = () => {
 const closePinEntry = () => {
   authStore.showPinEntry = false
 }
+
+const handleAddChildGoal = (goalData) => {
+  if (!childStore.activeChildId) return
+  homeworkStore.addHomework({
+    childId: childStore.activeChildId,
+    subject: goalData.subject,
+    title: goalData.title,
+    type: 'self'
+  })
+  showChildAddModal.value = false
+  toastStore.triggerToast(`「${goalData.title}」をつくったよ！がんばろう！`)
+}
 </script>
 
 <template>
@@ -140,7 +152,7 @@ const closePinEntry = () => {
 
     <!-- 4. じぶんの目標 追加モーダル (子ども画面用) -->
     <transition name="fade">
-      <ChildGoalAddModal v-if="showChildAddModal" @close="showChildAddModal = false" />
+      <ChildGoalAddModal v-if="showChildAddModal" @close="showChildAddModal = false" @add="handleAddChildGoal" />
     </transition>
 
     <!-- 5. 子どもの初期登録モーダル (保護者画面用) -->
