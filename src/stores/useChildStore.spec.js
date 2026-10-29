@@ -86,4 +86,13 @@ describe('useChildStore', () => {
     expect(store.currentChildId).toBe(null)
     expect(store.parentSelectedChildId).toBe(null)
   })
+
+  it("automatically sets currentChildId when first child is added", () => {
+    const store = useChildStore()
+    expect(store.currentChildId).toBe(null)
+
+    const added = store.addChild("たろう", "🐶")
+    expect(store.currentChildId).toBe(added.id)
+    expect(store.activeChildId).toBe(added.id)
+  })
 })

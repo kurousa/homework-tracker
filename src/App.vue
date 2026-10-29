@@ -96,9 +96,10 @@ const closePinEntry = () => {
 }
 
 const handleAddChildGoal = (goalData) => {
-  if (!childStore.activeChildId) return
+  const targetChildId = childStore.activeChildId || childStore.children[0]?.id
+  if (!targetChildId) return
   homeworkStore.addHomework({
-    childId: childStore.activeChildId,
+    childId: targetChildId,
     subject: goalData.subject,
     title: goalData.title,
     type: 'self'

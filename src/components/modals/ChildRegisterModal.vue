@@ -31,7 +31,7 @@ const handleRegister = () => {
   const added = childStore.addChild(name, selectedEmoji.value)
   if (added) {
     // 最初の登録時に自動的にお子様を選択状態にする
-    childStore.selectChild(added.id, true)
+    childStore.selectChild(added.id, !props.isFromChild)
     if (props.isFromChild) {
       authStore.setRole('child')
       emit('close')

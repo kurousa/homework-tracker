@@ -13,7 +13,7 @@ export const useChildStore = defineStore('child', () => {
   }, { deep: true })
 
   const savedCurrentChildId = localStorage.getItem(STORAGE_KEY_CURRENT_CHILD)
-  const currentChildId = ref(savedCurrentChildId ? parseInt(savedCurrentChildId) : null)
+  const currentChildId = ref(savedCurrentChildId ? parseInt(savedCurrentChildId) : (children.value[0]?.id || null))
   const parentSelectedChildId = ref(children.value[0]?.id || null)
 
   const activeChildId = computed(() => {
@@ -38,8 +38,11 @@ export const useChildStore = defineStore('child', () => {
     children.value.push(newChild)
 
     // 最初に追加した子どもをデフォルト選択状態にする
-    if (children.value.length === 1) {
-      parentSelectedChildId.value = newId
+    if (children.value.length === 1 || currentChildId.value === null) {
+      if (parentSelectedChildId.value === null) {
+        parentSelectedChildId.value = newId
+      }
+      selectChild(newId, false)
     }
     return newChild
   }
