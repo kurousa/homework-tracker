@@ -41,24 +41,44 @@ export const useHomeworkStore = defineStore('homework', () => {
     return activeHomeworks.value.filter(h => h.type === 'self')
   })
 
+  // Perf optimization: Count completed items without allocating intermediate arrays via .filter()
   const completedCount = computed(() => {
-    return activeHomeworks.value.filter(item => item.is_completed).length
+    let count = 0
+    const list = activeHomeworks.value
+    for (let i = 0; i < list.length; i++) {
+      if (list[i].is_completed) count++
+    }
+    return count
   })
 
   const progressPercentage = computed(() => {
-    if (activeHomeworks.value.length === 0) return 0
-    return Math.round((completedCount.value / activeHomeworks.value.length) * 100)
+    const list = activeHomeworks.value
+    if (list.length === 0) return 0
+    return Math.round((completedCount.value / list.length) * 100)
   })
 
+  // Perf optimization: Early exit loop instead of .every() array iteration
   const allDone = computed(() => {
-    return activeHomeworks.value.length > 0 && activeHomeworks.value.every(item => item.is_completed)
+    const list = activeHomeworks.value
+    if (list.length === 0) return false
+    for (let i = 0; i < list.length; i++) {
+      if (!list[i].is_completed) return false
+    }
+    return true
   })
 
   // Actions
+  // Perf optimization: Find max ID in single loop without allocating intermediate array via .map() and spreading
   const addHomework = (homeworkData) => {
-    const newId = homeworks.value.length > 0 ? Math.max(...homeworks.value.map(h => h.id)) + 1 : 1
+    let maxId = 0
+    const list = homeworks.value
+    for (let i = 0; i < list.length; i++) {
+      if (list[i].id > maxId) {
+        maxId = list[i].id
+      }
+    }
     homeworks.value.push({
-      id: newId,
+      id: maxId + 1,
       is_completed: false,
       ...homeworkData
     })

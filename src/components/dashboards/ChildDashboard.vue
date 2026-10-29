@@ -11,17 +11,20 @@ const toggleComplete = (item) => {
   homeworkStore.toggleComplete(item.id)
 }
 
+// Static lookup dictionary to eliminate switch evaluation and object re-creation per item on render
+const SUBJECT_STYLES = {
+  '国語': { bg: 'bg-rose-100', text: 'text-rose-700', border: 'border-rose-300' },
+  '算数': { bg: 'bg-sky-100', text: 'text-sky-700', border: 'border-sky-300' },
+  '理科': { bg: 'bg-emerald-100', text: 'text-emerald-700', border: 'border-emerald-300' },
+  '社会': { bg: 'bg-amber-100', text: 'text-amber-700', border: 'border-amber-300' },
+  '読書': { bg: 'bg-indigo-100', text: 'text-indigo-700', border: 'border-indigo-300' },
+  '体操': { bg: 'bg-orange-100', text: 'text-orange-700', border: 'border-orange-300' },
+  'お手伝い': { bg: 'bg-teal-100', text: 'text-teal-700', border: 'border-teal-300' }
+}
+const DEFAULT_SUBJECT_STYLE = { bg: 'bg-purple-100', text: 'text-purple-700', border: 'border-purple-300' }
+
 const getSubjectStyles = (subject) => {
-  switch(subject) {
-    case '国語': return { bg: 'bg-rose-100', text: 'text-rose-700', border: 'border-rose-300' }
-    case '算数': return { bg: 'bg-sky-100', text: 'text-sky-700', border: 'border-sky-300' }
-    case '理科': return { bg: 'bg-emerald-100', text: 'text-emerald-700', border: 'border-emerald-300' }
-    case '社会': return { bg: 'bg-amber-100', text: 'text-amber-700', border: 'border-amber-300' }
-    case '読書': return { bg: 'bg-indigo-100', text: 'text-indigo-700', border: 'border-indigo-300' }
-    case '体操': return { bg: 'bg-orange-100', text: 'text-orange-700', border: 'border-orange-300' }
-    case 'お手伝い': return { bg: 'bg-teal-100', text: 'text-teal-700', border: 'border-teal-300' }
-    default: return { bg: 'bg-purple-100', text: 'text-purple-700', border: 'border-purple-300' }
-  }
+  return SUBJECT_STYLES[subject] || DEFAULT_SUBJECT_STYLE
 }
 </script>
 

@@ -112,17 +112,20 @@ const toggleComplete = (item) => {
   homeworkStore.toggleComplete(item.id)
 }
 
+// Static lookup dictionary to eliminate switch evaluation and object re-creation per item on render
+const PARENT_SUBJECT_STYLES = {
+  '国語': { parentBg: 'bg-rose-50', parentText: 'text-rose-700 border-rose-200' },
+  '算数': { parentBg: 'bg-sky-50', parentText: 'text-sky-700 border-sky-200' },
+  '理科': { parentBg: 'bg-emerald-50', parentText: 'text-emerald-700 border-emerald-200' },
+  '社会': { parentBg: 'bg-amber-50', parentText: 'text-amber-700 border-amber-200' },
+  '読書': { parentBg: 'bg-indigo-50', parentText: 'text-indigo-700 border-indigo-200' },
+  '体操': { parentBg: 'bg-orange-50', parentText: 'text-orange-700 border-orange-200' },
+  'お手伝い': { parentBg: 'bg-teal-50', parentText: 'text-teal-700 border-teal-200' }
+}
+const DEFAULT_PARENT_SUBJECT_STYLE = { parentBg: 'bg-purple-50', parentText: 'text-purple-700 border-purple-200' }
+
 const getSubjectStyles = (subject) => {
-  switch(subject) {
-    case '国語': return { parentBg: 'bg-rose-50', parentText: 'text-rose-700 border-rose-200' }
-    case '算数': return { parentBg: 'bg-sky-50', parentText: 'text-sky-700 border-sky-200' }
-    case '理科': return { parentBg: 'bg-emerald-50', parentText: 'text-emerald-700 border-emerald-200' }
-    case '社会': return { parentBg: 'bg-amber-50', parentText: 'text-amber-700 border-amber-200' }
-    case '読書': return { parentBg: 'bg-indigo-50', parentText: 'text-indigo-700 border-indigo-200' }
-    case '体操': return { parentBg: 'bg-orange-50', parentText: 'text-orange-700 border-orange-200' }
-    case 'お手伝い': return { parentBg: 'bg-teal-50', parentText: 'text-teal-700 border-teal-200' }
-    default: return { parentBg: 'bg-purple-50', parentText: 'text-purple-700 border-purple-200' }
-  }
+  return PARENT_SUBJECT_STYLES[subject] || DEFAULT_PARENT_SUBJECT_STYLE
 }
 
 // 子ども管理用のリアクティブデータとメソッド
